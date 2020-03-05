@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,13 +29,20 @@ public class CorsoDAO {
 			ResultSet rs = st.executeQuery();
 
 			while (rs.next()) {
+				Corso c=new Corso();
 
 				String codins = rs.getString("codins");
 				int numeroCrediti = rs.getInt("crediti");
 				String nome = rs.getString("nome");
 				int periodoDidattico = rs.getInt("pd");
+				
+				c.setCodins(codins);
+				c.setCrediti(numeroCrediti);
+				c.setNome(nome);
+				c.setPeriodo(periodoDidattico);
+				corsi.add(c);
 
-				System.out.println(codins + " " + numeroCrediti + " " + nome + " " + periodoDidattico);
+				//System.out.println(codins + " " + numeroCrediti + " " + nome + " " + periodoDidattico);
 
 				// Crea un nuovo JAVA Bean Corso
 				// Aggiungi il nuovo oggetto Corso alla lista corsi
@@ -58,8 +66,43 @@ public class CorsoDAO {
 	/*
 	 * Ottengo tutti gli studenti iscritti al Corso
 	 */
-	public void getStudentiIscrittiAlCorso(Corso corso) {
-		// TODO
+	public ArrayList<Studente> getStudentiIscrittiAlCorso(Corso corso) {
+		final String sql = "SELECT s.matricola, s.nome, s.cognome\n" + 
+				"FROM studente s,iscrizione i\n" + 
+				"WHERE i.matricola=s.matricola AND i.codins=?";
+
+		ArrayList<Studente> studenti = new ArrayList<Studente>();
+
+		try {
+			Connection conn = ConnectDB.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, corso.getCodins());
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				Studente s=new Studente();
+				int matricola=rs.getInt("matricola");
+				String cognome = rs.getString("cognome");
+				
+				String nome = rs.getString("nome");
+				
+				s.setMatricola(matricola);
+				s.setNome(rs.getString("nome"));
+				s.setCognome(rs.getString("cognome"));
+				studenti.add(s);
+
+				//System.out.println(codins + " " + numeroCrediti + " " + nome + " " + periodoDidattico);
+
+				// Crea un nuovo JAVA Bean Corso
+				// Aggiungi il nuovo oggetto Corso alla lista corsi
+			}
+
+			return studenti;
+
+		} catch (SQLException e) {
+			// e.printStackTrace();
+			throw new RuntimeException("Errore Db", e);
+		}
 	}
 
 	/*
@@ -70,4 +113,10 @@ public class CorsoDAO {
 		// ritorna true se l'iscrizione e' avvenuta con successo
 		return false;
 	}
+	
+	
+	
+	
+	
+	
 }

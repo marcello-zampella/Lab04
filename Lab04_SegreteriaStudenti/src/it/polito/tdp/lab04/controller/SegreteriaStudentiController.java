@@ -39,7 +39,6 @@ public class SegreteriaStudentiController {
     		return;
     	}
     	int matricola=Integer.parseInt(this.txtMatricola.getText());
-    	
     	Studente s=model.getStudenteByMatricola(matricola);
     	if(s==null) {
     		this.txtArea.setText("LA MATRICOLA NON ESISTE");
